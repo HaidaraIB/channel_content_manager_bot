@@ -1,0 +1,3 @@
+from admin.post_settings.post_settings import post_settings_handler
+from admin.post_settings.add_posts import add_posts_handler
+from admin.post_settings.get_post import get_post_handler

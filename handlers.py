@@ -16,6 +16,8 @@ from admin.admin_calls import *
 from admin.admin_settings import *
 from admin.broadcast import *
 from admin.ban import *
+from admin.post_settings import *
+from admin.channels_settings import *
 
 from models import create_tables
 
@@ -33,6 +35,14 @@ def main():
             callback=invalid_callback_data, pattern=InvalidCallbackData
         )
     )
+
+    app.add_handler(channels_settings_handler)
+    app.add_handler(add_channel_handler)
+    app.add_handler(delete_channel_handler)
+
+    app.add_handler(post_settings_handler)
+    app.add_handler(add_posts_handler)
+    app.add_handler(get_post_handler)
 
     app.add_handler(user_settings_handler)
     app.add_handler(change_lang_handler)

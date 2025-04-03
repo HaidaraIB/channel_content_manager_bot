@@ -33,7 +33,13 @@ class BaseModel(Base):
 
     @classmethod
     @connect_and_close
-    def get_by(cls, conds: dict = None, all: bool = False, s: Session = None):
+    def get_by(
+        cls,
+        conds: dict = None,
+        all: bool = False,
+        last: bool = False,
+        s: Session = None,
+    ):
         if conds:
             res = s.scalars(
                 sa.select(cls).where(
@@ -42,6 +48,14 @@ class BaseModel(Base):
             )
             if all:
                 return res.all()
+            if last:
+                all_res = res.all()
+                if all_res:
+                    return all_res[-1]
             return res.first()
         res = s.scalars(sa.select(cls))
+        if last:
+            all_res = res.all()
+            if all_res:
+                return all_res[-1]
         return res.all()
