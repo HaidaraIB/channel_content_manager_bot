@@ -43,7 +43,7 @@ async def set_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @add_new_user_dec
 @check_if_user_banned_dec
-@check_if_user_member_decorator
+# @check_if_user_member_decorator
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == Chat.PRIVATE:
         await set_commands(update, context)
