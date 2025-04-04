@@ -12,8 +12,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
 )
-if Config.OWNER_ID != 755501092:
-    logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 def check_hidden_keyboard(context: ContextTypes.DEFAULT_TYPE):

@@ -8,7 +8,7 @@ from common.common import get_lang
 from custom_filters import Admin
 
 
-@check_if_user_member_decorator
+# @check_if_user_member_decorator
 async def back_to_user_home_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == Chat.PRIVATE:
         lang = get_lang(update.effective_user.id)
