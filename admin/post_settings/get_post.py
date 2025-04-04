@@ -24,10 +24,27 @@ async def get_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             build_back_button("back_to_post_settings"),
             build_back_to_home_page_button()[0],
         ]
-        await update.callback_query.edit_message_text(
-            text="أرسل رقم المنشور",
-            reply_markup=InlineKeyboardMarkup(back_buttons),
-        )
+        posts = models.Post.get_by()
+        if not posts:
+            await update.callback_query.answer(
+                text="ليس لديك منشورات ❗️",
+                show_alert=True,
+            )
+            return ConversationHandler.END
+        text = f"أرسل رقم المنشور من <b>{posts[0].id}</b> إلى <b>{posts[-1].id}</b>"
+        if update.callback_query.data.startswith("back"):
+            await update.callback_query.delete_message()
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=text,
+                reply_markup=InlineKeyboardMarkup(back_buttons),
+            )
+
+        else:
+            await update.callback_query.edit_message_text(
+                text=text,
+                reply_markup=InlineKeyboardMarkup(back_buttons),
+            )
         return POST_ID
 
 
@@ -196,6 +213,9 @@ async def refresh_post(post_id: int, chat_id: int, bot: Bot):
     return True
 
 
+back_to_get_post_id = get_post
+
+
 get_post_handler = ConversationHandler(
     entry_points=[
         CallbackQueryHandler(
@@ -236,5 +256,6 @@ get_post_handler = ConversationHandler(
         CallbackQueryHandler(
             back_to_choose_update_option, "^back_to_choose_update_option"
         ),
+        CallbackQueryHandler(back_to_get_post_id, "^back_to_get_post_id"),
     ],
 )
