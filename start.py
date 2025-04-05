@@ -15,7 +15,9 @@ from common.decorators import (
 from common.keyboards import build_user_keyboard, build_admin_keyboard
 from common.common import check_hidden_keyboard, get_lang
 from common.lang_dicts import TEXTS
+from common.constants import *
 from Config import Config
+from datetime import datetime
 
 
 async def inits(app: Application):
@@ -29,6 +31,7 @@ async def inits(app: Application):
             "is_admin": True,
         },
     )
+    await models.Scheduling.add(vals={"id": 1})
 
 
 async def set_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):

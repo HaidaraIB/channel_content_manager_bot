@@ -37,6 +37,12 @@ def build_admin_keyboard():
         ],
         [
             InlineKeyboardButton(
+                text="الجدولة 🗓",
+                callback_data="scheduling",
+            )
+        ],
+        [
+            InlineKeyboardButton(
                 text="إعدادات القنوات 📢",
                 callback_data="channels_settings",
             )

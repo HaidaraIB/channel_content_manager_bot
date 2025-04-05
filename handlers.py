@@ -18,10 +18,14 @@ from admin.broadcast import *
 from admin.ban import *
 from admin.post_settings import *
 from admin.channels_settings import *
+from admin.scheduling import *
+
+from jobs import reset_daily_posted_count, reschedule
 
 from models import create_tables
-
+from datetime import time
 from MyApp import MyApp
+from common.constants import *
 
 
 def main():
@@ -36,22 +40,27 @@ def main():
         )
     )
 
-    app.add_handler(channels_settings_handler)
+    app.add_handler(update_scheduling_handler)
+    app.add_handler(change_state_handler)
+    app.add_handler(change_scheduling_type_handler)
+    app.add_handler(scheduling_handler)
+
     app.add_handler(add_channel_handler)
     app.add_handler(delete_channel_handler)
+    app.add_handler(channels_settings_handler)
 
-    app.add_handler(post_settings_handler)
     app.add_handler(add_posts_handler)
     app.add_handler(get_post_handler)
+    app.add_handler(post_settings_handler)
 
     app.add_handler(user_settings_handler)
     app.add_handler(change_lang_handler)
 
     # ADMIN SETTINGS
-    app.add_handler(admin_settings_handler)
     app.add_handler(show_admins_handler)
     app.add_handler(add_admin_handler)
     app.add_handler(remove_admin_handler)
+    app.add_handler(admin_settings_handler)
 
     app.add_handler(broadcast_message_handler)
 
@@ -65,6 +74,17 @@ def main():
     app.add_handler(hide_ids_keyboard_handler)
     app.add_handler(back_to_user_home_page_handler)
     app.add_handler(back_to_admin_home_page_handler)
+
+    app.job_queue.run_daily(
+        callback=reset_daily_posted_count,
+        time=time(0, tzinfo=TIMEZONE),
+        job_kwargs={
+            "id": "reset_daily_posted_count",
+            "misfire_grace_time": None,
+            "coalesce": True,
+            "replace_existing": True,
+        },
+    )
 
     app.add_error_handler(error_handler)
 

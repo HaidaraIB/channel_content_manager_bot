@@ -3,10 +3,11 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 import uuid
 from common.keyboards import build_request_buttons
-from Config import Config
 import logging
 import os
 import models
+from datetime import datetime
+from common.constants import *
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -42,3 +43,11 @@ async def invalid_callback_data(update: Update, context: ContextTypes.DEFAULT_TY
 
 def get_lang(user_id: int):
     return models.User.get_by(conds={"user_id": user_id}).lang.name
+
+
+def format_datetime(d: datetime):
+    return d.replace(tzinfo=TIMEZONE).strftime(r"%d/%m/%Y  %I:%M %p")
+
+
+def format_float(f: float):
+    return f"{float(f):,.2f}".rstrip("0").rstrip(".")
