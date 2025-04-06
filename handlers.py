@@ -79,7 +79,7 @@ def main():
         callback=reset_daily_posted_count,
         time=time(0, tzinfo=TIMEZONE),
         job_kwargs={
-            "id": "1_regular_post_job",
+            "id": "reset_daily_posted_count",
             "misfire_grace_time": None,
             "coalesce": True,
             "replace_existing": True,
