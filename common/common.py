@@ -46,7 +46,7 @@ def get_lang(user_id: int):
 
 
 def format_datetime(d: datetime):
-    return d.replace(tzinfo=TIMEZONE).strftime(r"%d/%m/%Y  %I:%M %p")
+    return d.replace(tzinfo=TIMEZONE).strftime(r"%Y-%m-%d  %I:%M %p")
 
 
 def format_float(f: float):

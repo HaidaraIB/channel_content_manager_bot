@@ -3,8 +3,8 @@ from telegram.ext import ContextTypes
 import models
 from datetime import datetime
 from common.constants import *
-from common.common import format_float
-
+from common.common import format_float, format_datetime
+from apscheduler.job import Job
 
 def get_next_post_datetime(
     context: ContextTypes.DEFAULT_TYPE,
@@ -12,13 +12,13 @@ def get_next_post_datetime(
 ):
     if scheduling_type == "regular":
         for i in range(1, 4):
-            post_job = context.job_queue.scheduler.get_job(f"{i}_regular_post_job")
+            post_job: Job = context.job_queue.scheduler.get_job(f"{i}_regular_post_job")
             if post_job:
-                return post_job[0].next_t
+                return post_job.next_run_time
     else:
-        random_post_job = context.job_queue.scheduler.get_job("random_post_job")
+        random_post_job: Job = context.job_queue.scheduler.get_job("random_post_job")
         if random_post_job:
-            return random_post_job[0].next_t
+            return random_post_job.next_run_time
 
 
 def stringify_scheduling_info(context: ContextTypes.DEFAULT_TYPE):
@@ -46,7 +46,7 @@ def stringify_scheduling_info(context: ContextTypes.DEFAULT_TYPE):
         f"- المنجز: <b>{scheduling_info.next_post_id - 1}/{last_post.id} ({format_float(((scheduling_info.next_post_id - 1) * 100)/last_post.id)}%)</b>\n"
         f"- المنجز اليوم: <b>{scheduling_info.daily_posted_count}/{scheduling_info.daily_posts_count} ({format_float((scheduling_info.daily_posted_count *100)/scheduling_info.daily_posts_count)}%)</b>\n"
         f"- المتبقي: <b>{remaining_days} يوم</b>\n"
-        f"- التالي: المنشور <b>#{scheduling_info.next_post_id}</b> عند <b>{next_post_datetime if next_post_datetime else 'غير محدد'}</b>\n\n"
+        f"- التالي: المنشور <b>#{scheduling_info.next_post_id}</b> عند\n<b>{format_datetime(next_post_datetime) if next_post_datetime else 'غير محدد'}</b>\n\n"
         f"<i><b>تنبيه</b></i>: لن يتم تطبيق التعديلات حتى اليوم التالي ❗️"
     )
 
