@@ -6,19 +6,23 @@ from common.constants import *
 from common.common import format_float, format_datetime
 from apscheduler.job import Job
 
+
 def get_next_post_datetime(
     context: ContextTypes.DEFAULT_TYPE,
     scheduling_type: str,
-):
+) -> datetime:
+    next_run_time: datetime = None
     if scheduling_type == "regular":
         for i in range(1, 4):
             post_job: Job = context.job_queue.scheduler.get_job(f"{i}_regular_post_job")
             if post_job:
-                return post_job.next_run_time
+                next_run_time = post_job.next_run_time
+                break
     else:
         random_post_job: Job = context.job_queue.scheduler.get_job("random_post_job")
         if random_post_job:
-            return random_post_job.next_run_time
+            next_run_time = random_post_job.next_run_time
+    return next_run_time.astimezone(tz=TIMEZONE)
 
 
 def stringify_scheduling_info(context: ContextTypes.DEFAULT_TYPE):
