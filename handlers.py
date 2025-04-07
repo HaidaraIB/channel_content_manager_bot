@@ -20,7 +20,7 @@ from admin.post_settings import *
 from admin.channels_settings import *
 from admin.scheduling import *
 
-from jobs import reset_daily_posted_count, reschedule
+from jobs import reset_daily_posted_count
 
 from models import create_tables
 from datetime import time

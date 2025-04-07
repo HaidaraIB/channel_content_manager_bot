@@ -113,10 +113,6 @@ async def do_post(context: ContextTypes.DEFAULT_TYPE):
 
 async def reschedule(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
-    now = datetime.now(tz=TIMEZONE).date()
-    if scheduling_info.start_date and now < scheduling_info.start_date:
-        return
-
     remove_existing_jobs(context)
 
     if scheduling_info.scheduling_type == "regular":

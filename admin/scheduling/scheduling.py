@@ -13,7 +13,7 @@ from common.back_to_home_page import back_to_admin_home_page_handler
 from admin.scheduling.common import stringify_scheduling_info, build_scheduling_keyboard
 from datetime import date, datetime
 from start import admin_command
-from jobs import remove_existing_jobs, reschedule
+from jobs import reschedule
 import models
 
 DAILY_POSTS_COUNT, START_DATE = range(2)
@@ -89,27 +89,7 @@ async def get_start_date(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # guard for unchanged start_date cases to prevent unnecessary reschedule
         if scheduling_info.start_date != start_date:
             await scheduling_info.update_one(update_dict={"start_date": start_date})
-            remove_existing_jobs(
-                context
-            )  # we must remove_jobs right away to stop posting immediately
-            context.job_queue.run_once(
-                callback=reschedule,
-                when=datetime(
-                    start_date.year,
-                    start_date.month,
-                    start_date.day,
-                    0,
-                    0,
-                    tzinfo=TIMEZONE,
-                ),
-                name="reschedule",
-                job_kwargs={
-                    "id": "reschedule",
-                    "misfire_grace_time": None,
-                    "coalesce": True,
-                    "replace_existing": True,
-                },
-            )
+            await reschedule(context)
 
         await update.message.reply_text(text="تم تعديل تاريخ البدء بنجاح ✅")
 
@@ -122,8 +102,8 @@ async def change_scheduling_type(update: Update, context: ContextTypes.DEFAULT_T
         scheduling_info = models.Scheduling.get_by(conds={"id": 1})
         # guard for unchanged scheduling_type cases to prevent unnecessary reschedule
         if scheduling_info.scheduling_type != new_scheduling_type:
-            await models.Scheduling.update(
-                row_id=1, update_dict={"scheduling_type": new_scheduling_type}
+            await scheduling_info.update_one(
+                update_dict={"scheduling_type": new_scheduling_type}
             )
             await reschedule(context)
 
