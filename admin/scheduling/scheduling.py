@@ -55,7 +55,7 @@ async def choose_scheduling_option(update: Update, context: ContextTypes.DEFAULT
             text = (
                 f"أرسل تاريخ البدء بالتنسيق\n"
                 "<code>YYYY-MM-DD</code>\n"
-                f"التاريخ الحالي: <b>{scheduling_info.start_date if scheduling_info else 'غير محدد'}</b>"
+                f"التاريخ الحالي:\n<b>{scheduling_info.start_date if scheduling_info else 'غير محدد'}</b>"
             )
             RET = START_DATE
         await update.callback_query.edit_message_text(
