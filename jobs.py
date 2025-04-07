@@ -1,7 +1,7 @@
 from telegram.ext import ContextTypes
 import models
 from common.constants import *
-from datetime import time, datetime
+from datetime import time
 
 
 SCHEDULING_JOBS_NAME = "scheduling_jobs"
@@ -24,7 +24,7 @@ async def schedule_daily_random_posting(context: ContextTypes.DEFAULT_TYPE):
 
 async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
-    interval = 60 / (scheduling_info.daily_posts_count / 12) * 60
+    interval = 60 / (scheduling_info.daily_posts_count / 18) * 60
     context.job_queue.run_repeating(
         callback=do_post,
         interval=interval,
@@ -75,6 +75,9 @@ async def do_post(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
 
     if not scheduling_info.is_on:
+        return
+
+    elif scheduling_info.daily_posted_count == scheduling_info.daily_posts_count:
         return
 
     next_post_id = scheduling_info.next_post_id
