@@ -22,7 +22,7 @@ def get_next_post_datetime(
         random_post_job: Job = context.job_queue.scheduler.get_job("random_post_job")
         if random_post_job:
             next_run_time = random_post_job.next_run_time
-    return next_run_time.astimezone(tz=TIMEZONE)
+    return next_run_time.astimezone(tz=TIMEZONE) if next_run_time else None
 
 
 def stringify_scheduling_info(context: ContextTypes.DEFAULT_TYPE):
