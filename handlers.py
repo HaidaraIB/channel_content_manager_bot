@@ -19,8 +19,9 @@ from admin.ban import *
 from admin.post_settings import *
 from admin.channels_settings import *
 from admin.scheduling import *
+from admin.buttons_settings import *
 
-from jobs import reset_daily_posted_count
+from jobs import reset_daily_posted_count, do_post
 
 from models import create_tables
 from datetime import time
@@ -39,6 +40,10 @@ def main():
             callback=invalid_callback_data, pattern=InvalidCallbackData
         )
     )
+
+    app.add_handler(delete_buttons_handler)
+    app.add_handler(add_buttons_handler)
+    app.add_handler(buttons_settings_handler)
 
     app.add_handler(update_scheduling_handler)
     app.add_handler(change_state_handler)
@@ -74,6 +79,8 @@ def main():
     app.add_handler(hide_ids_keyboard_handler)
     app.add_handler(back_to_user_home_page_handler)
     app.add_handler(back_to_admin_home_page_handler)
+
+    app.add_handler(show_popup_handler)
 
     app.job_queue.run_daily(
         callback=reset_daily_posted_count,

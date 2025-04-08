@@ -37,6 +37,12 @@ def build_admin_keyboard():
         ],
         [
             InlineKeyboardButton(
+                text="إعدادات الأزرار ⌨️",
+                callback_data="buttons_settings",
+            )
+        ],
+        [
+            InlineKeyboardButton(
                 text="الجدولة 🗓",
                 callback_data="scheduling",
             )

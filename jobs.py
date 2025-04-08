@@ -1,3 +1,4 @@
+from telegram import InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 import models
 from common.constants import *
@@ -16,7 +17,6 @@ async def schedule_daily_random_posting(context: ContextTypes.DEFAULT_TYPE):
         interval=24 * 60 * 60 / scheduling_info.daily_posts_count,
         job_kwargs={
             "id": "random_post_job",
-            "misfire_grace_time": None,
             "coalesce": True,
             "replace_existing": True,
         },
@@ -34,7 +34,6 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
         name=POSTING_JOBS_NAME,
         job_kwargs={
             "id": "1_regular_post_job",
-            "misfire_grace_time": None,
             "coalesce": True,
             "replace_existing": True,
         },
@@ -47,7 +46,6 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
         name=POSTING_JOBS_NAME,
         job_kwargs={
             "id": "2_regular_post_job",
-            "misfire_grace_time": None,
             "coalesce": True,
             "replace_existing": True,
         },
@@ -60,7 +58,6 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
         name=POSTING_JOBS_NAME,
         job_kwargs={
             "id": "3_regular_post_job",
-            "misfire_grace_time": None,
             "coalesce": True,
             "replace_existing": True,
         },
@@ -88,23 +85,28 @@ async def do_post(context: ContextTypes.DEFAULT_TYPE):
         post = models.Post.get_by(conds={"id": next_post_id})
 
     channels = models.Channel.get_by()
+    keyboard = models.Button.build_keyboard()
+    reply_markup = InlineKeyboardMarkup(keyboard) if keyboard else None
     for channel in channels:
         if post.photo:
             await context.bot.send_photo(
                 chat_id=channel.channel_id,
                 photo=post.photo,
                 caption=post.text,
+                reply_markup=reply_markup,
             )
         elif post.video:
             await context.bot.send_video(
                 chat_id=channel.channel_id,
                 video=post.video,
                 caption=post.text,
+                reply_markup=reply_markup,
             )
         else:
             await context.bot.send_message(
                 chat_id=channel.channel_id,
                 text=post.text,
+                reply_markup=reply_markup,
             )
 
     await scheduling_info.update_one(
@@ -127,7 +129,6 @@ async def reschedule(context: ContextTypes.DEFAULT_TYPE):
             name=SCHEDULING_JOBS_NAME,
             job_kwargs={
                 "id": "schedule_daily_regular_posting_job",
-                "misfire_grace_time": None,
                 "coalesce": True,
                 "replace_existing": True,
             },
@@ -139,7 +140,6 @@ async def reschedule(context: ContextTypes.DEFAULT_TYPE):
             name=SCHEDULING_JOBS_NAME,
             job_kwargs={
                 "id": "schedule_daily_random_posting_job",
-                "misfire_grace_time": None,
                 "coalesce": True,
                 "replace_existing": True,
             },
