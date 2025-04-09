@@ -21,6 +21,8 @@ class BaseModel(Base):
     @lock_and_release
     async def update_one(self, update_dict: dict, s: Session = None):
         s.query(type(self)).filter_by(id=self.id).update(update_dict)
+        # for k, v in update_dict.items():
+        #     setattr(self, k, v)
 
     @classmethod
     @lock_and_release

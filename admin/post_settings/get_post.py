@@ -9,6 +9,7 @@ from telegram.ext import (
 from custom_filters import Admin
 from common.keyboards import build_back_to_home_page_button, build_back_button
 from common.back_to_home_page import back_to_admin_home_page_handler
+from common.common import send_post
 import models
 from Config import Config
 from start import admin_command
@@ -57,7 +58,7 @@ async def get_post_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
         res = await refresh_post(
             post_id=post_id,
             chat_id=update.effective_chat.id,
-            bot=context.bot,
+            context=context,
         )
         if not res:
             await update.message.reply_text(text="لم يتم العثور على المنشور ❗️"),
@@ -155,12 +156,12 @@ async def get_new_val(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await refresh_post(
             post_id=post_id,
             chat_id=update.effective_chat.id,
-            bot=context.bot,
+            context=context,
         )
         return POST_OPTION
 
 
-async def refresh_post(post_id: int, chat_id: int, bot: Bot):
+async def refresh_post(post_id: int, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
     post = models.Post.get_by(conds={"id": post_id})
     if not post:
         return False
@@ -190,26 +191,12 @@ async def refresh_post(post_id: int, chat_id: int, bot: Bot):
                 )
             ],
         )
-    if post.photo:
-        await bot.send_photo(
-            chat_id=chat_id,
-            photo=post.photo,
-            caption=post.text,
-            reply_markup=InlineKeyboardMarkup(post_options_keyboard),
-        )
-    elif post.video:
-        await bot.send_video(
-            chat_id=chat_id,
-            video=post.video,
-            caption=post.text,
-            reply_markup=InlineKeyboardMarkup(post_options_keyboard),
-        )
-    else:
-        await bot.send_message(
-            chat_id=chat_id,
-            text=post.text,
-            reply_markup=InlineKeyboardMarkup(post_options_keyboard),
-        )
+    await send_post(
+        post=post,
+        context=context,
+        chat_id=chat_id,
+        reply_markup=InlineKeyboardMarkup(post_options_keyboard),
+    )
     return True
 
 

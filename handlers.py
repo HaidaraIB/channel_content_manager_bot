@@ -21,7 +21,7 @@ from admin.channels_settings import *
 from admin.scheduling import *
 from admin.buttons_settings import *
 
-from jobs import reset_daily_posted_count, do_post
+from jobs import reset_daily_posted_count, post_job
 
 from models import create_tables
 from datetime import time

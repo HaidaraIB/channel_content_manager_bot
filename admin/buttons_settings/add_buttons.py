@@ -37,10 +37,11 @@ async def add_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "نص الزر - t.me/LinkExample\n\n"
                 "<u>• أدخل زر يعرض نافذة منبثقة:</u>\n"
                 "نص الزر - popup: نص النافذة المنبثقة\n\n"
-                # "<u>• أدخل زر مشاركة:</u>\n"
-                # "نص الزر - share: نص للمشاركة\n\n"
+                "<u>• أدخل زر مشاركة:</u>\n"
+                "نص الزر - share: نص للمشاركة\n\n"
                 # "<u>• أدخل زر تعليقات:</u>\n"
                 # "اسم الزر - comments\n"
+                # "💡 <a href='https://botguide.me/s/ch-en/doc/create-posts-o7DmqM0oIB#h-comments-button'>تعرف علي كيفية القيام بذلك</a>"
             ),
             reply_markup=InlineKeyboardMarkup(back_buttons),
         )
@@ -73,18 +74,18 @@ async def get_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         callback_data=f"popup:{button_data['popup_text']}",
                     )
                 )
-            # elif button_data["type"] == "share":
+            elif button_data["type"] == "share":
+                keyboard[row].append(
+                    InlineKeyboardButton(
+                        text=button_data["text"],
+                        url=f"https://t.me/share/url?url={button_data['share_text']}",
+                    )
+                )
+            # elif button_data["type"] == "comments":
             #     keyboard[row].append(
             #         InlineKeyboardButton(
             #             text=button_data["text"],
-            #             switch_inline_query=button_data["share_text"],
-            #         )
-            #     )
-            # elif button_data['type'] == 'comments':
-            #     keyboard[row].append(
-            #         InlineKeyboardButton(
-            #             text=button_data['text'],
-            #             url="https://t.me/your_channel/123"  # Replace with actual URL
+            #             callback_data="popup:You can't use it here!",
             #         )
             #     )
 
@@ -127,8 +128,8 @@ async def confirm_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 vals["telegram_link"] = button_data["telegram_link"]
             elif button_data["type"] == "popup":
                 vals["popup_text"] = button_data["popup_text"]
-            # elif button_data["type"] == "share":
-            #     vals["share_text"] = button_data["share_text"]
+            elif button_data["type"] == "share":
+                vals["share_text"] = button_data["share_text"]
             # elif button_data["type"] == "comments":
             #     pass  # No additional fields needed
 

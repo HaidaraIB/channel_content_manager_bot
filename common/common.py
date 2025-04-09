@@ -1,4 +1,9 @@
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import (
+    Update,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    InlineKeyboardMarkup,
+)
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 import uuid
@@ -51,3 +56,32 @@ def format_datetime(d: datetime):
 
 def format_float(f: float):
     return f"{float(f):,.2f}".rstrip("0").rstrip(".")
+
+
+async def send_post(
+    post: models.Post,
+    context: ContextTypes.DEFAULT_TYPE,
+    chat_id: int,
+    reply_markup: InlineKeyboardMarkup = None,
+):
+    if post.photo:
+        p = await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=post.photo,
+            caption=post.text,
+            reply_markup=reply_markup,
+        )
+    elif post.video:
+        p = await context.bot.send_video(
+            chat_id=chat_id,
+            video=post.video,
+            caption=post.text,
+            reply_markup=reply_markup,
+        )
+    else:
+        p = await context.bot.send_message(
+            chat_id=chat_id,
+            text=post.text,
+            reply_markup=reply_markup,
+        )
+    return p

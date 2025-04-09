@@ -2,8 +2,8 @@ from telegram import InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 import models
 from common.constants import *
+from common.common import send_post
 from datetime import time
-
 
 SCHEDULING_JOBS_NAME = "scheduling_jobs"
 POSTING_JOBS_NAME = "posting_jobs"
@@ -12,7 +12,7 @@ POSTING_JOBS_NAME = "posting_jobs"
 async def schedule_daily_random_posting(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
     context.job_queue.run_repeating(
-        callback=do_post,
+        callback=post_job,
         name=POSTING_JOBS_NAME,
         interval=24 * 60 * 60 / scheduling_info.daily_posts_count,
         job_kwargs={
@@ -27,7 +27,7 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
     interval = 60 / (scheduling_info.daily_posts_count / 18) * 60
     context.job_queue.run_repeating(
-        callback=do_post,
+        callback=post_job,
         interval=interval,
         first=time(hour=1, tzinfo=TIMEZONE),
         last=time(hour=5, tzinfo=TIMEZONE),
@@ -39,7 +39,7 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
         },
     )
     context.job_queue.run_repeating(
-        callback=do_post,
+        callback=post_job,
         interval=interval,
         first=time(hour=9, tzinfo=TIMEZONE),
         last=time(hour=13, tzinfo=TIMEZONE),
@@ -51,7 +51,7 @@ async def schedule_daily_regular_posting(context: ContextTypes.DEFAULT_TYPE):
         },
     )
     context.job_queue.run_repeating(
-        callback=do_post,
+        callback=post_job,
         interval=interval,
         first=time(hour=17, tzinfo=TIMEZONE),
         last=time(hour=21, tzinfo=TIMEZONE),
@@ -69,7 +69,7 @@ async def reset_daily_posted_count(context: ContextTypes.DEFAULT_TYPE):
     await scheduling_info.update_one(update_dict={"daily_posted_count": 0})
 
 
-async def do_post(context: ContextTypes.DEFAULT_TYPE):
+async def post_job(context: ContextTypes.DEFAULT_TYPE):
     scheduling_info = models.Scheduling.get_by(conds={"id": 1})
 
     if not scheduling_info.is_on:
@@ -88,26 +88,12 @@ async def do_post(context: ContextTypes.DEFAULT_TYPE):
     keyboard = models.Button.build_keyboard()
     reply_markup = InlineKeyboardMarkup(keyboard) if keyboard else None
     for channel in channels:
-        if post.photo:
-            await context.bot.send_photo(
-                chat_id=channel.channel_id,
-                photo=post.photo,
-                caption=post.text,
-                reply_markup=reply_markup,
-            )
-        elif post.video:
-            await context.bot.send_video(
-                chat_id=channel.channel_id,
-                video=post.video,
-                caption=post.text,
-                reply_markup=reply_markup,
-            )
-        else:
-            await context.bot.send_message(
-                chat_id=channel.channel_id,
-                text=post.text,
-                reply_markup=reply_markup,
-            )
+        await send_post(
+            post=post,
+            context=context,
+            chat_id=channel.channel_id,
+            reply_markup=reply_markup,
+        )
 
     await scheduling_info.update_one(
         update_dict={

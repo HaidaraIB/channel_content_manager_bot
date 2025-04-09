@@ -71,8 +71,26 @@ class Button(BaseModel):
                         else f"popup:{button.popup_text}"
                     ),
                 )
-            else:
-                continue  # Skip unknown button types
+            elif button.button_type == "share":
+                btn = InlineKeyboardButton(
+                    text=button.text,
+                    url=(
+                        f"https://t.me/share/url?url={button.share_text}"
+                        if not with_ids
+                        else None
+                    ),
+                    callback_data=f"button_{button.id}" if with_ids else None,
+                )
+            # else:
+            #     btn = InlineKeyboardButton(
+            #         text=button.text,
+            #         url=(
+            #             f""
+            #             if not with_ids
+            #             else None
+            #         ),
+            #         callback_data=f"button_{button.id}" if with_ids else None,
+            #     )
 
             # Organize by row
             if button.row not in keyboard_dict:

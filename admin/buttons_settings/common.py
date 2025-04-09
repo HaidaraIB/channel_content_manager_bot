@@ -7,7 +7,7 @@ BUTTON_REGEX = re.compile(
     r"^("
     r".+? - t\.me\/[^\s)]+(?:\(https:\/\/t\.me\/[^)]+\))?|"  # Telegram link
     r".+? - popup:.+|"  # Popup button
-    # r".+? - share:.+|"  # Share button
+    r".+? - share:.+|"  # Share button
     # r".+? - comments|"  # Comments button
     r"(.+? - (?:t\.me\/[^\s)]+|popup:[^&]+|share:[^&]+|comments))(?: && .+? - (?:t\.me\/[^\s)]+|popup:[^&]+|share:[^&]+|comments))+"  # Multiple buttons
     r")$",
@@ -59,11 +59,11 @@ def parse_single_button(button_text: str):
             "regex": re.compile(r"^(.+?) - popup:(.+?)$"),
             "groups": ["text", "popup_text"],
         },
-        # {
-        #     "name": "share",
-        #     "regex": re.compile(r"^(.+?) - share:(.+?)$"),
-        #     "groups": ["text", "share_text"],
-        # },
+        {
+            "name": "share",
+            "regex": re.compile(r"^(.+?) - share:(.+?)$"),
+            "groups": ["text", "share_text"],
+        },
         # {
         #     "name": "comments",
         #     "regex": re.compile(r"^(.+?) - comments$"),
