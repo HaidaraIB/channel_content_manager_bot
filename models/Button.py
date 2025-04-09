@@ -81,7 +81,8 @@ class Button(BaseModel):
                     ),
                     callback_data=f"button_{button.id}" if with_ids else None,
                 )
-            # else:
+            else:
+                continue
             #     btn = InlineKeyboardButton(
             #         text=button.text,
             #         url=(
