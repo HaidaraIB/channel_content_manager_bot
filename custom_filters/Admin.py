@@ -5,12 +5,16 @@ import models
 
 class Admin(UpdateFilter):
     def filter(self, update: Update):
-        return models.User.get_by(
-            conds={
-                "user_id": (
-                    update.effective_user.id
-                    if update.effective_user
-                    else update.effective_sender.id
-                ),
-            },
-        ).is_admin
+        try:
+            return models.User.get_by(
+                conds={
+                    "user_id": (
+                        update.effective_user.id
+                        if update.effective_user
+                        else update.effective_sender.id
+                    ),
+                },
+            ).is_admin
+        except:
+            return False
+            
