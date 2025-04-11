@@ -9,6 +9,8 @@ from common.back_to_home_page import (
 from common.error_handler import error_handler
 from common.force_join import check_joined_handler
 
+from bot.store_post import store_post_handler
+
 from user.user_calls import *
 from user.user_settings import *
 
@@ -29,7 +31,7 @@ from MyApp import MyApp
 from common.constants import *
 
 
-def main():
+def setup_and_run_app():
     create_folders()
     create_tables()
 
@@ -81,6 +83,8 @@ def main():
     app.add_handler(back_to_admin_home_page_handler)
 
     app.add_handler(show_popup_handler)
+
+    app.add_handler(store_post_handler)
 
     app.job_queue.run_daily(
         callback=reset_daily_posted_count,

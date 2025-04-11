@@ -11,7 +11,7 @@ filterwarnings(
     action="ignore", message=r".*invalid escape sequence.*", category=SyntaxWarning
 )
 
-from handlers import main
+from handlers import setup_and_run_app
 
 if __name__ == "__main__":
-    main()
+    setup_and_run_app()

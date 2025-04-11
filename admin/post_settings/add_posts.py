@@ -1,4 +1,4 @@
-from telegram import Update, Chat, InlineKeyboardMarkup, error
+from telegram import Update, Chat, InlineKeyboardMarkup, error, Message
 from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler,
@@ -47,27 +47,20 @@ async def get_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == Chat.PRIVATE and Admin().filter(update):
         try:
             await add_post_lock.acquire()
-            await add_one_post(update, context)
-        except:
-            import traceback
-            traceback.print_exc()
+            post = await send_post(update=update, context=context)
+        except error.RetryAfter as r:
+            await asyncio.sleep(r.retry_after)
         finally:
             add_post_lock.release()
         context.user_data["added_posts_counter"] += 1
 
 
-async def add_one_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def send_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.photo:
         post = await context.bot.send_photo(
             chat_id=Config.POSTS_CHANNEL,
             photo=update.message.photo[-1],
             caption=update.message.caption_html,
-        )
-        await models.Post.add(
-            vals={
-                "photo": post.photo[-1].file_id,
-                "text": post.caption_html,
-            }
         )
     elif update.message.video:
         post = await context.bot.send_video(
@@ -75,22 +68,12 @@ async def add_one_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             video=update.message.video,
             caption=update.message.caption_html,
         )
-        await models.Post.add(
-            vals={
-                "video": post.video,
-                "text": post.caption_html,
-            }
-        )
     else:
         post = await context.bot.send_message(
             chat_id=Config.POSTS_CHANNEL,
             text=update.message.text_html,
         )
-        await models.Post.add(
-            vals={
-                "text": post.text_html,
-            }
-        )
+    return post
 
 
 async def done_sending_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
